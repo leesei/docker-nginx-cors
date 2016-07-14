@@ -5,7 +5,7 @@ WWW_PORT="10080"
 WWW_ROOT="${PWD}"
 
 SCRIPT=$(basename "$0")
-DIR=$(realpath $(dirname "$0"))
+DIR=$(readlink -f $(dirname "$0"))
 source "${DIR}/colors.source"
 
 _BSCRIPT=${_BLD}${SCRIPT}${_RST_}
@@ -91,10 +91,10 @@ if [[ $# -eq 0 ]]; then
 	exit
 fi
 if [[ $# -ge 1 ]]; then
-	WWW_ROOT=$(realpath ${1})
+	WWW_ROOT=$(readlink -f ${1})
 fi
 
-docker run --rm -p ${WWW_PORT}:80 ${CONTAINER_NAME} \
+docker run -d -p ${WWW_PORT}:80 ${CONTAINER_NAME} \
 	-v "${DIR}/nginx.conf":/etc/nginx/nginx.conf:ro \
 	-v "${DIR}/nginx.vh.default.conf":/etc/nginx/conf.d/default.conf:ro \
 	-v "${WWW_ROOT}":/usr/share/nginx/html:ro \

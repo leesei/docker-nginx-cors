@@ -1,0 +1,103 @@
+#!/bin/bash
+
+CONTAINER_NAME=""
+WWW_PORT="10080"
+WWW_ROOT="${PWD}"
+
+SCRIPT=$(basename "$0")
+DIR=$(realpath $(dirname "$0"))
+source "${DIR}/colors.source"
+
+_BSCRIPT=${_BLD}${SCRIPT}${_RST_}
+function _help()
+{
+	echo -e
+	echo -e "${_BSCRIPT} - Serve a folder with Docker's `nginx:alpine` with CORS"
+	echo -e
+	echo -e "${_BU}Synopsis${_RST_}"
+	echo -e
+	echo -e "  ${_BSCRIPT}"
+	echo -e "  ${_BSCRIPT} --help"
+	echo -e "    Display this help"
+	echo -e
+	echo -e "  ${SCRIPT} [${_UND}option${_RST_}] ${_UND}FOLDER${_RST_}"
+	echo -e "    Serve ${_UND}FOLDER${_RST_} with Nginx"
+	echo -e
+	echo -e "${_BU}Supported options${_RST_}"
+	echo -e
+	echo -e "  -n, --name ${_UND}NAME${_RST_}:"
+	echo -e "    Name of container [optional]"
+	echo -e
+	echo -e "  -p, --port ${_UND}PORT${_RST_}:"
+	echo -e "    Port to bind to host [default=${_BLD}${WWW_PORT}${_RST_}]"
+	echo -e
+	echo -e "${_BLD}Author:${_RST_} ${_UND}leesei@gmail.com${_RST_}      ${_BLD}Licence:${_RST_} MIT"
+	echo -e
+
+	# error messages
+	if [[ $# -ne 0 ]]; then
+		echo  # separator
+		echo -en "${RED}"
+		while [ -n "$*" ]; do
+			echo "$1"; shift
+		done
+		echo -en "${_RST_}"
+		echo
+	fi
+}
+
+# Parse arguments
+TEMP=$(getopt -n "${SCRIPT}" -o n:p:h \
+--long name,port,help \
+-- "$@")
+
+# $@ are the remaining options
+# echo "\$@: [$@]"
+if [ $? -ne 0 ]; then
+	_help "getopt error"
+	exit 2
+fi
+
+eval set -- "$TEMP"
+while true; do
+	case $1 in
+	-n|--name)
+		CONTAINER_NAME="--name $2";
+		shift 2; continue
+		;;
+	-p|--port)
+		WWW_PORT="$2";
+		shift 2; continue
+		;;
+	-h|--help)
+		_help
+		exit 0
+		;;
+	--)
+		# no more arguments to parse
+		shift; break
+		;;
+	*)
+		printf "Unknown option %s\n" "$1"
+		exit 1
+		;;
+	esac
+done
+
+# $@ are the remaining options
+# echo "$@"
+if [[ $# -eq 0 ]]; then
+	_help
+	exit
+fi
+if [[ $# -ge 1 ]]; then
+	WWW_ROOT=$(realpath ${1})
+fi
+
+docker run --rm -p ${WWW_PORT}:80 ${CONTAINER_NAME} \
+	-v "${DIR}/nginx.conf":/etc/nginx/nginx.conf:ro \
+	-v "${DIR}/nginx.vh.default.conf":/etc/nginx/conf.d/default.conf:ro \
+	-v "${WWW_ROOT}":/usr/share/nginx/html:ro \
+	-l WWW_PORT="${WWW_PORT}"\
+	-l WWW_ROOT="${WWW_ROOT}"\
+	nginx:alpine

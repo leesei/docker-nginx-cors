@@ -14,8 +14,12 @@ git clone https://github.com/leesei/docker-nginx-cors
 ./nserve -p 9000 ~/share
 ```
 
-Use this command (requires [`jq`](https://stedolan.github.io/jq/manual/))to verify the config of the created container:
+Use this command to verify the config of the created container:
 ```sh
+docker inspect --format="{{.Volumes}}" [${CONTAINER_NAME}|${CONTAINER_ID}]
+docker inspect --format="{{.Config.Labels}}" [${CONTAINER_NAME}|${CONTAINER_ID}]
+
+# with [`jq`](https://stedolan.github.io/jq/manual/)
 docker inspect [${CONTAINER_NAME}|${CONTAINER_ID}] | jq .[0].Volumes
 docker inspect [${CONTAINER_NAME}|${CONTAINER_ID}] | jq .[0].Config.Labels
 ```

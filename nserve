@@ -94,10 +94,18 @@ if [[ $# -ge 1 ]]; then
 	WWW_ROOT=$(readlink -f ${1})
 fi
 
-docker run -d -p ${WWW_PORT}:80 ${CONTAINER_NAME} \
-	-v "${DIR}/nginx.conf":/etc/nginx/nginx.conf:ro \
-	-v "${DIR}/nginx.vh.default.conf":/etc/nginx/conf.d/default.conf:ro \
+NGINX_ID=$(docker run -d \
+	-p ${WWW_PORT}:80 ${CONTAINER_NAME} \
+	-v "${DIR}/nginx/nginx.conf":/etc/nginx/nginx.conf:ro \
+	-v "${DIR}/nginx/conf.d":/etc/nginx/conf.d:ro \
 	-v "${WWW_ROOT}":/usr/share/nginx/html:ro \
 	-l WWW_PORT="${WWW_PORT}"\
 	-l WWW_ROOT="${WWW_ROOT}"\
-	nginx:alpine
+	nginx:alpine)
+
+if [ $? -eq 0 ]; then
+	echo "Nginx serving [${WWW_ROOT}] at port [${WWW_PORT}]."
+	echo "Use this to save the ID of the Docker container:"
+	echo
+	echo "  export NGINX_ID=${NGINX_ID}"
+fi

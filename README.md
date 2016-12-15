@@ -1,6 +1,6 @@
 # docker-nginx-cors
 
-A script for starting Docker's [`nginx:alpine`](https://github.com/nginxinc/docker-nginx/tree/master/mainline/alpine) image with CORS on arbitrary folder and arbitrary port.
+A script for starting Docker's [`nginx:alpine`](https://github.com/nginxinc/docker-nginx/tree/master/mainline/alpine) image with CORS, and optionally HTTPS, on arbitrary folder and arbitrary port.
 
 ## Install
 
@@ -25,6 +25,18 @@ docker inspect [${CONTAINER_NAME}|${CONTAINER_ID}] | jq .[0].Config.Labels
 ```
 
 You can also fork this repo and customize `nginx.conf`, `nginx.vh.default.conf` to fit your needs.
+
+### HTTPS
+
+- Place an certificate key pair in `conf.d/` (with name `https.{key,crt}`)
+- Enable `https.conf` include in `conf.d/default.conf`
+
+To create self-signed certs:
+```sh
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/conf.d/https.key -out nginx/conf.d/https.crt
+# fill the IP/domain of your server to "Common Name"
+# otherwise the browser will reject to connect to the server
+```
 
 ## TODO
 

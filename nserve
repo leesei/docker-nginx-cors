@@ -2,6 +2,7 @@
 
 CONTAINER_NAME=""
 WWW_PORT="10080"
+WWW_PORTS="10443"
 WWW_ROOT="${PWD}"
 
 SCRIPT=$(basename "$0")
@@ -29,7 +30,10 @@ function _help()
 	echo -e "    Name of container [optional]"
 	echo -e
 	echo -e "  -p, --port ${_UND}PORT${_RST_}:"
-	echo -e "    Port to bind to host [default=${_BLD}${WWW_PORT}${_RST_}]"
+	echo -e "    HTTP port to bind to host [default=${_BLD}${WWW_PORT}${_RST_}]"
+	echo -e
+	echo -e "  -s, --ports ${_UND}PORTs${_RST_}:"
+	echo -e "    HTTPS port to bind to host [default=${_BLD}${WWW_PORTS}${_RST_}]"
 	echo -e
 	echo -e "${_BLD}Author:${_RST_} ${_UND}leesei@gmail.com${_RST_}      ${_BLD}Licence:${_RST_} MIT"
 	echo -e
@@ -46,8 +50,13 @@ function _help()
 	fi
 }
 
+# detect if HTTPS is enabled in `default.conf`
+grep -e "include /etc/nginx/conf.d/snippets/https.conf" "${DIR}/nginx/conf.d/default.conf" | grep -e "#\s*include" > /dev/null
+HTTPS_ENABLED=$?
+# echo "HTTPS_ENABLED=$HTTPS_ENABLED"; exit
+
 # Parse arguments
-TEMP=$(getopt -n "${SCRIPT}" -o n:p:h \
+TEMP=$(getopt -n "${SCRIPT}" -o n:p:s:h \
 --long name,port,help \
 -- "$@")
 
@@ -67,6 +76,10 @@ while true; do
 		;;
 	-p|--port)
 		WWW_PORT="$2";
+		shift 2; continue
+		;;
+	-s|--ports)
+		WWW_PORTS="$2";
 		shift 2; continue
 		;;
 	-h|--help)
@@ -94,17 +107,28 @@ if [[ $# -ge 1 ]]; then
 	WWW_ROOT=$(readlink -f ${1})
 fi
 
+DOCKER_HTTPS_PORT=""
+DOCKER_HTTPS_LABEL=""
+if [ $HTTPS_ENABLED -eq 1 ]; then
+	DOCKER_HTTPS_PORT="-p ${WWW_PORTS}:443"
+	DOCKER_HTTPS_LABEL="-l WWW_PORTS=${WWW_PORTS}"
+fi
 NGINX_ID=$(docker run -d \
-	-p ${WWW_PORT}:80 ${CONTAINER_NAME} \
+	-p ${WWW_PORT}:80 ${DOCKER_HTTPS_PORT} ${CONTAINER_NAME} \
 	-v "${DIR}/nginx/nginx.conf":/etc/nginx/nginx.conf:ro \
 	-v "${DIR}/nginx/conf.d":/etc/nginx/conf.d:ro \
 	-v "${WWW_ROOT}":/usr/share/nginx/html:ro \
 	-l WWW_PORT="${WWW_PORT}"\
+	${DOCKER_HTTPS_LABEL}\
 	-l WWW_ROOT="${WWW_ROOT}"\
 	nginx:alpine)
 
 if [ $? -eq 0 ]; then
-	echo "Nginx serving [${WWW_ROOT}] at port [${WWW_PORT}]."
+	PORT="[${WWW_PORT}] (http)"
+	if [ $HTTPS_ENABLED -eq 1 ]; then
+		PORT+=", [${WWW_PORTS}] (https)"
+	fi
+	echo "Nginx serving [${WWW_ROOT}] at port ${PORT}."
 	echo "Use this to save the ID of the Docker container:"
 	echo
 	echo "  export NGINX_ID=${NGINX_ID}"

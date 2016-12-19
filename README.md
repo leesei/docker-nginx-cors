@@ -38,6 +38,14 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/conf.d/https.k
 # otherwise the browser will reject to connect to the server
 ```
 
-## TODO
+### Access Control
 
-failed to show index (403)
+- Create `.htaccess` to specify the username and password  
+  Invoke this multiple times for multiple users.
+```sh
+echo "<username>:`perl -le 'print crypt(\"<password>\", "salt-hash")'`:comment" >> nginx/conf.d/.htaccess
+```
+- Enable `auth-basic.conf` include in `conf.d/default.conf`
+- You can also create new location block that includes `auth-basic.conf`
+
+Its recommended to **enable HTTPS** with Basic Auth, otherwise the credentials will be sent in plaintext and vulnerable to sniffing.

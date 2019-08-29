@@ -1,4 +1,3 @@
 nginx/**/*key
 nginx/**/*crt
-nginx/**/*key
 nginx/**/.ht*

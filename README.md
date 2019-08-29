@@ -2,6 +2,8 @@
 
 A script for starting Docker's [`nginx:alpine`](https://github.com/nginxinc/docker-nginx/tree/master/mainline/alpine) image with CORS, and optionally HTTPS, on arbitrary folder and arbitrary port.
 
+This is a script that load config files in the current directory rather than a Docker image. This allows for multiple instances of `docker-nginx-cors` running simultaneously with different configs.
+
 ## Install
 
 ```sh
@@ -15,6 +17,7 @@ git clone https://github.com/leesei/docker-nginx-cors
 ```
 
 Use this command to verify the config of the created container:
+
 ```sh
 docker inspect --format="{{.Volumes}}" [${CONTAINER_NAME}|${CONTAINER_ID}]
 docker inspect --format="{{.Config.Labels}}" [${CONTAINER_NAME}|${CONTAINER_ID}]
@@ -32,6 +35,7 @@ You can also fork this repo and customize `nginx.conf`, `nginx.vh.default.conf` 
 - Enable `https.conf` include in `conf.d/default.conf`
 
 To create self-signed certs:
+
 ```sh
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/conf.d/https.key -out nginx/conf.d/https.crt
 # fill the IP/domain of your server to "Common Name"
@@ -49,8 +53,7 @@ Its recommended to **enable HTTPS** with Basic Auth, otherwise the credentials w
 
 ## References
 
-[h5bp/server-configs-nginx: Nginx HTTP server boilerplate configs](https://github.com/h5bp/server-configs-nginx)
-[Cipherli.st - Strong Ciphers for Apache, nginx and Lighttpd](https://cipherli.st/)
-[How To Set Up Nginx with HTTP/2 Support on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-with-http-2-support-on-ubuntu-16-04)
+[h5bp/server-configs-nginx: Nginx HTTP server boilerplate configs](https://github.com/h5bp/server-configs-nginx)  
+[Cipherli.st - Strong Ciphers for Apache, nginx and Lighttpd](https://cipherli.st/)  
+[How To Set Up Nginx with HTTP/2 Support on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-with-http-2-support-on-ubuntu-16-04)  
 [HTTP 2.0 With Nginx - Servers for Hackers](https://serversforhackers.com/video/http-20-with-nginx)
-

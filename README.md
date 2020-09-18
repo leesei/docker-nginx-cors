@@ -44,7 +44,7 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/conf.d/https.k
 
 ### Access Control
 
-- Create `.htaccess` to specify the username and password  
+- Create `conf.d/.htaccess` to specify the username and password  
   [NGINX Docs | Restricting Access with HTTP Basic Authentication](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/)
 - Enable `auth-basic.conf` include in `conf.d/default.conf`
 - You can also create new location block that includes `auth-basic.conf`

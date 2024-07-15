@@ -59,7 +59,7 @@ Its recommended to **enable HTTPS** with Basic Auth, otherwise the credentials w
 ## References
 
 [h5bp/server-configs-nginx: Nginx HTTP server boilerplate configs](https://github.com/h5bp/server-configs-nginx)  
-[Cipherli.st - Strong Ciphers for Apache, nginx and Lighttpd](https://cipherli.st/)  
+[Cipherli.st - Strong Ciphers for Apache, nginx and Lighttpd](https://syslink.pl/cipherlist/)  
 [How To Set Up Nginx with HTTP/2 Support on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-with-http-2-support-on-ubuntu-16-04)  
-[HTTP 2.0 With Nginx - Servers for Hackers](https://serversforhackers.com/video/http-20-with-nginx)
+[HTTP 2.0 With Nginx | Servers for Hackers](https://serversforhackers.com/c/http-20-with-nginx)
 [NGINX Docs | Restricting Access with HTTP Basic Authentication](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/)
